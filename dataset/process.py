@@ -29,41 +29,49 @@ def process_entry(file):
 
 def extract_eraab(word, description):
     eraab_group = re.search(r'^\[([^\]]*)\]', description)
-    # assert (len(eraab_group.groups()) == 1)
     eraab = eraab_group.group(1).strip() if eraab_group is not None else eraab_group
-    if eraab == '':
-        eraab = None
+    transformed_word = add_eraab_to_word(word, eraab)
 
-    if eraab is not None:
-        eraab_list = eraab.strip().replace('ء', 'ئ').split(' ')
-        transformed_word = ''
-        word_idx = 0
-        eraab_idx = 0
-        while eraab_idx < len(eraab_list):
-            if word_idx >= len(word):
-                print(f'erorr parsing {word} with {eraab}')
-                return word
+    if validate_pronounce(transformed_word):
+        return transformed_word
+    else:
+        return None
 
-            if eraab_list[eraab_idx] == '/':
-                eraab_idx += 2
-                continue
-            transformed_word += word[word_idx]
+def add_eraab_to_word(word, eraab):
+    if eraab is None: return word
 
-            if eraab_list[eraab_idx][0] == word[word_idx]:
-                if len(eraab_list[eraab_idx]) == 2 and eraab_list[eraab_idx][1] in 'َُِْ':
-                    transformed_word += eraab_list[eraab_idx][1]
-                elif len(eraab_list[eraab_idx]) == 2 and eraab_list[eraab_idx][1] == word[word_idx + 1]:
-                    pass
-                else:
-                    print(f'wrong eraab {eraab} for word {word}')
-                    return word
-                eraab_idx += 1
+    eraab_list = eraab.strip().replace('ء', 'ئ').split(' ')
+    for part in eraab_list:
+        if len(part) != 2 and part != '/':
+            print(f'wrong eraab {eraab} for word {word} in part {part}')
+            return ''
+    transformed_word = ''
+    word_idx = 0
+    eraab_idx = 0
+    while eraab_idx < len(eraab_list):
+        if word_idx >= len(word):
+            print(f'erorr parsing {word} with {eraab}')
+            return ''
 
-            word_idx += 1
-        if word_idx < len(word):
-            transformed_word = (transformed_word + word[word_idx:]) 
-    return transformed_word if eraab is not None else word
+        if eraab_list[eraab_idx] == '/':
+            eraab_idx += 2
+            continue
+        transformed_word += word[word_idx]
 
+        if eraab_list[eraab_idx][0] == word[word_idx]:
+            if eraab_list[eraab_idx][1] in 'َُِْ':
+                transformed_word += eraab_list[eraab_idx][1]
+            elif word_idx + 1 < len(word) and eraab_list[eraab_idx][1] == word[word_idx + 1]:
+                pass
+            else:
+                print(f'wrong eraab {eraab} for word {word}')
+                return ''
+            eraab_idx += 1
+
+        word_idx += 1
+    if word_idx < len(word):
+        transformed_word = (transformed_word + word[word_idx:]) 
+    return transformed_word 
 
 def validate_pronounce(eraab):
     #TODO: add characters that allow 3 samet.
@@ -86,7 +94,6 @@ def validate_pronounce(eraab):
             return False
     return True if samet < 3 else False
 
-
 def extract_pos(description):
     pos_group = re.search(r'<span style="color:orange">\((.*)\)</span>', description)
     # assert (len(pos_group.groups()) == 1)
@@ -95,7 +102,7 @@ def extract_pos(description):
 
 def extract_meaning(description):
     #TODO
-    return(None, None)
+    return None
 
 class Database:
     def __init__(self, db_file = 'dehkhoda.db'):
@@ -125,12 +132,12 @@ class Database:
 if __name__ == "__main__":
 #iterate over folders
     start_time = time.time()
-    # counter = 1 
+    counter = 1 
     db = Database()
     for i in range(35):
         for file in os.listdir(f'dehkhoda/{i}/'):
-            # print(counter)
-            # counter += 1
+            counter += 1
+            if counter % 100 == 0 : print(counter)
             word, description = process_entry(f'dehkhoda/{i}/{file}')
             if ' ' in word or '‌' in word: #space or half space
                 continue
@@ -138,12 +145,13 @@ if __name__ == "__main__":
                 print(f'{file} is empty')
             pos = extract_pos(description)
             eraab = extract_eraab(word, description)
-            if not validate_pronounce(eraab):
-                print(f'eraab {eraab} is not pronouncable')
+
             # meaning = extract_meaning(description)
             meaning = description
             IPA = None
             db.insert(word, pos, eraab, IPA, meaning)
+        print("+"*100)
         print(f"end of file{i} in {time.time() - start_time} seconds")
+        print(f"added {counter} words to db")
 
     del db

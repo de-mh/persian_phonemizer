@@ -3,7 +3,7 @@ import os
 import sqlite3
 import re
 import time
-
+from IPA_dicts import vowels, consonants
 
 def process_entry(file):
     with open(file, encoding='utf-8') as f:
@@ -100,6 +100,29 @@ def extract_pos(description):
     pos = pos_group.group(1) if pos_group is not None else pos_group
     return pos
 
+def extract_IPA(word):
+    if word == None:
+        return None
+    idx = 1
+    ipa = consonants[word[0]]
+    prev = "a" # any char except vowels will do.
+    while idx < len(word):
+        if word[idx] in "اَُِْ":
+            ipa += vowels[word[idx]]
+        elif prev in "اَُِْ":
+            ipa += consonants[word[idx]]
+        elif word[idx] in "یو":
+            if prev in "وی":
+                ipa += consonants[prev] + vowels[word[idx]]
+            else:
+                ipa += vowels[word[idx]]
+        else:
+            ipa += consonants[word[idx]]
+        prev = word[idx]
+        idx += 1
+    return ipa
+
+
 def extract_meaning(description):
     #TODO
     return None
@@ -139,16 +162,15 @@ if __name__ == "__main__":
             counter += 1
             if counter % 100 == 0 : print(counter)
             word, description = process_entry(f'dehkhoda/{i}/{file}')
-            if ' ' in word or '‌' in word: #space or half space
+            if ' ' in word or '‌' in word or 'ة' in word: #space or half space
                 continue
             if word == None or word == '':
                 print(f'{file} is empty')
             pos = extract_pos(description)
             eraab = extract_eraab(word, description)
-
             # meaning = extract_meaning(description)
             meaning = description
-            IPA = None
+            IPA = extract_IPA(eraab)
             db.insert(word, pos, eraab, IPA, meaning)
         print("+"*100)
         print(f"end of file{i} in {time.time() - start_time} seconds")

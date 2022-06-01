@@ -87,6 +87,8 @@ def validate_pronounce(eraab):
     # TODO: add characters that allow 3 samet.
     samet = 3
     start = True
+    if eraab[-1] in "َُِ":
+        return False
     for ch in eraab:
         if start:
             start = False

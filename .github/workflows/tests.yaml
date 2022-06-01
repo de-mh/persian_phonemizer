@@ -1,0 +1,17 @@
+name: Tests
+on:
+  push:
+    branches: [ main , develop ]
+  pull_request:
+    branches: [ main , develop ]
+  workflow_dispatch:
+  
+jobs:
+  build:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Run process unit tests
+        run: python -m unittest discover -s tests/unit

@@ -20,9 +20,3 @@ class TestExtractIPA(unittest.TestCase):
         cases = [("آرادان", "ʔɒːɾɒːdɒːn"), ("آتابَیک", "ʔɒːtʰɒːbæjkʰ"), ("بینی", "biːniː"), ("اَبناء", "ʔæbnɒːʔ")]
         for case in cases:
             self.assertEqual(extract_IPA(case[0]), case[1])
-
-# class TestAddEraabToWord(unittest.TestCase):
-#   def test_add_eraab_to_word(self):
-#       cases = [("آرادان", "ʔɒːɾɒːdɒːn"), ("آتابَیک", "ʔɒːtʰɒːbæjkʰ"), ("بینی", "biːniː"), ("اَبناء", "ʔæbnɒːʔ")]
-#       for case in cases:
-#           self.assertEqual(add_eraab_to_word(case[0]), case[1])

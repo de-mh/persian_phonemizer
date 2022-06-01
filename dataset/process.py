@@ -14,22 +14,22 @@ def process_entry(file):
         text = f.read()
         word_group = re.search(r'<h1 class="text-justify">([\s\S^<]*)<\/h1>', text)
         if word_group is None:
-            logging.error(f"{file} has no word")
+            logger.error(f"{file} has no word")
             word = word_group
         else:
             word = word_group.group(1)
             if not (len(word_group.groups()) == 1):
-                logging.error(f"{file} more than one word")
+                logger.error(f"{file} more than one word")
         des_group = re.search(
             r'<div class="content text-justify">([\s\S]*)<\/div>', text
         )
         if des_group is None:
             description = des_group
-            logging.error(f"{file} has no description")
+            logger.error(f"{file} has no description")
         else:
             description = des_group.group(1).strip()
             if not (len(des_group.groups()) == 1):
-                logging.error(f"{file} more than one description")
+                logger.error(f"{file} more than one description")
 
     return (word, description)
 
@@ -52,14 +52,14 @@ def add_eraab_to_word(word, eraab):
     eraab_list = eraab.strip().replace("ء", "ئ").split(" ")
     for part in eraab_list:
         if len(part) != 2 and part != "/":
-            logging.warning(f"wrong eraab {eraab} for word {word} in part {part}")
+            logger.warning(f"wrong eraab {eraab} for word {word} in part {part}")
             return ""
     transformed_word = ""
     word_idx = 0
     eraab_idx = 0
     while eraab_idx < len(eraab_list):
         if word_idx >= len(word):
-            logging.warning(f"erorr parsing {word} with {eraab}")
+            logger.warning(f"erorr parsing {word} with {eraab}")
             return ""
 
         if eraab_list[eraab_idx] == "/":
@@ -76,7 +76,7 @@ def add_eraab_to_word(word, eraab):
             ):
                 pass
             else:
-                logging.warning(f"wrong eraab {eraab} for word {word}")
+                logger.warning(f"wrong eraab {eraab} for word {word}")
                 return ""
             eraab_idx += 1
 
@@ -90,6 +90,8 @@ def validate_pronounce(eraab):
     # TODO: add characters that allow 3 samet.
     samet = 3
     start = True
+    if len(eraab) == 0:
+        return False
     if eraab[-1] in "َُِ":
         return False
     for ch in eraab:
@@ -179,19 +181,19 @@ if __name__ == "__main__":
         for file in os.listdir(f"dehkhoda/{i}/"):
             counter += 1
             if counter % 100 == 0:
-                logging.info(counter)
+                logger.info(counter)
             word, description = process_entry(f"dehkhoda/{i}/{file}")
             if " " in word or "‌" in word or "ة" in word:  # space or half space
                 continue
             if word == None or word == "":
-                logging.error(f"{file} is empty")
+                logger.error(f"{file} is empty")
             pos = extract_pos(description)
             eraab = extract_eraab(word, description)
             # meaning = extract_meaning(description)
             meaning = description
             IPA = extract_IPA(eraab)
             db.insert(word, pos, eraab, IPA, meaning)
-        logging.info(f"end of file{i} in {time.time() - start_time} seconds")
-        logging.info(f"added {counter} words to db")
+        logger.info(f"end of file{i} in {time.time() - start_time} seconds")
+        logger.info(f"added {counter} words to db")
 
     del db

@@ -4,6 +4,9 @@ import sqlite3
 import re
 import time
 from IPA_dicts import vowels, consonants
+import logging
+
+logger = logging.getLogger('process_logger')
 
 
 def process_entry(file):

@@ -41,9 +41,9 @@ class Phonemizer():
 
     def get_pronounce(self, word):
         if self.output_format == "IPA":
-            return word.IPA
+            return word[4]
         elif self.output_format == "eraab":
-            return word.eraab
+            return word[2]
 
     def predict_pronounce(self, word):
         return None

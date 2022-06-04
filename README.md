@@ -13,10 +13,12 @@ A few examples of use cases of this library are:
 
 Fast start:
 
-```>>> from persian_phonemizer import Phonemizer
+```
+>>> from persian_phonemizer import Phonemizer
 >>> phonemizer = Phonemizer()
 >>> phonemizer.phonemize("این یک متن فارسی است.")
 'ʔiːn jækʰ mætʰn fɒːɾsiː ʔæstʰ .'
+
 ```
 
 If you want to add new data or create the database from scratch, look in the dataset directory.

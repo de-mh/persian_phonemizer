@@ -1,7 +1,7 @@
 from distutils.log import error
 import hazm
 from regex import W
-from utils import valid_word, Database
+from persian_phonemizer.utils import valid_word, Database
 
 class Phonemizer():
 

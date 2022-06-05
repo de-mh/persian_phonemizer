@@ -15,6 +15,7 @@ jobs:
 
       - name: Run process unit tests
         run: |
+          python -m unittest discover -s tests/
           cd dataset
           python -m unittest discover -s tests/unit
           cd ..

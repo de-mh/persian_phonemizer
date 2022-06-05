@@ -12,9 +12,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-
+        with:
+          lfs: 'true'
+      - run: pip install -r requirements.txt
       - name: Run process unit tests
         run: |
+          python -m unittest discover -s tests/
           cd dataset
           python -m unittest discover -s tests/unit
           cd ..

@@ -42,7 +42,7 @@ class Phonemizer():
             pronounce = self.get_pronounce(pronounces[0])
         else:
             # needs disambiguation
-            pronounce = self.choose_pronounce(self, sentence_tokens, idx, pronounces)
+            pronounce = self.choose_pronounce(sentence_tokens, idx, pronounces)
         return pronounce
 
     def get_pronounce(self, pronounce):
@@ -57,14 +57,15 @@ class Phonemizer():
     def choose_pronounce(self, sentence_tokens, idx, pronounces):
         tagged_list = self.tagger.tag(sentence_tokens)
         word, pos = tagged_list[idx]
-        persian_pos = translate_pos(pos)
+        persian_pos = self.translate_pos(pos)
         for pronounce in pronounces:
             if persian_pos in pronounce[3]:
                 return self.get_pronounce(pronounce)
         # warning : no match
         return self.get_pronounce(pronounces[0])       
 
-
+    def translate_pos(self, pos):
+        return pos
 
     def __del__(self):
         del self.db

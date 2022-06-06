@@ -1,6 +1,10 @@
 from distutils.log import error
 import hazm
-from persian_phonemizer.utils import valid_word, Database
+from persian_phonemizer.utils import (
+    valid_word,
+     Database,
+     POS_MODEL_PATH
+)
 
 class Phonemizer():
 
@@ -9,6 +13,7 @@ class Phonemizer():
             raise error #fix
         self.output_format = output_format
         self.normalize = normalize
+        self.tagger = hazm.POSTagger(model=POS_MODEL_PATH)
         if normalize:
             self.normalizer = hazm.Normalizer()
         self.db = Database()
@@ -18,13 +23,15 @@ class Phonemizer():
             text = self.normalizer.normalize(text)
         phonemized_list = []
         for sentence in hazm.sent_tokenize(text):
-            for word in hazm.word_tokenize(sentence):
-                pronounce = self.phonemize_word(word)
+            sentence_tokens = hazm.word_tokenize(sentence)
+            for idx, _ in enumerate(sentence_tokens):
+                pronounce = self.phonemize_word(sentence_tokens, idx)
                 phonemized_list.append(pronounce)
         return " ".join(phonemized_list)
         
             
-    def phonemize_word(self, word):
+    def phonemize_word(self, sentence_tokens, idx):
+        word = sentence_tokens[idx]
         if not valid_word(word):
             return word
         pronounces = self.db.lookup_word(word)
@@ -35,17 +42,27 @@ class Phonemizer():
             pronounce = self.get_pronounce(pronounces[0])
         else:
             # needs disambiguation
-            pronounce = self.get_pronounce(pronounces[0])
+            pronounce = self.choose_pronounce(self, sentence_tokens, idx, pronounces)
         return pronounce
 
-    def get_pronounce(self, word):
+    def get_pronounce(self, pronounce):
         if self.output_format == "IPA":
-            return word[4]
+            return pronounce[4]
         elif self.output_format == "eraab":
-            return word[2]
+            return pronounce[2]
 
     def predict_pronounce(self, word):
-        return None
+        return word
+
+    def choose_pronounce(self, sentence_tokens, idx, pronounces):
+        tagged_list = self.tagger.tag(sentence_tokens)
+        word, pos = tagged_list[idx]
+        persian_pos = translate_pos(pos)
+        for pronounce in pronounces:
+            if persian_pos in pronounce[3]:
+                return self.get_pronounce(pronounce)
+        # warning : no match
+        return self.get_pronounce(pronounces[0])       
 
 
 

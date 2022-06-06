@@ -2,11 +2,13 @@ import sqlite3
 import re
 import os
 
+this_dir, _ = os.path.split(__file__)
+POS_MODEL_PATH = os.path.join(this_dir, "data/postagger.model")
+
 class Database:
     def __init__(self, db_file=""):
-        """create a database connection to a SQLite database and create table if not exists"""
+        """create a database connection to a SQLite database"""
         if db_file == "":
-            this_dir, _ = os.path.split(__file__)
             db_file = os.path.join(this_dir, "data/dehkhoda.db")
         self.conn = sqlite3.connect(db_file)
         self.cursor = self.conn.cursor()

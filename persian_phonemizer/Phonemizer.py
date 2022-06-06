@@ -59,6 +59,8 @@ class Phonemizer():
         word, pos = tagged_list[idx]
         persian_pos = self.translate_pos(pos)
         for pronounce in pronounces:
+            if pronounce[3] == None:
+                continue
             if persian_pos in pronounce[3]:
                 return self.get_pronounce(pronounce)
         # warning : no match

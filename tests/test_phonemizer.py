@@ -5,7 +5,7 @@ from persian_phonemizer import Phonemizer
 class TestPhonemizer(unittest.TestCase):
     def test_Phonemizer_IPA(self):
         phonemizer = Phonemizer()
-        cases = [("آرادان", "ʔɒːɾɒːdɒːn"),
+        cases = [("فارسی", "fɒːɾsiː"),
          ("این یک متن فارسی است.", "ʔiːn jækʰ mætʰn fɒːɾsiː ʔæstʰ .")]
         for case in cases:
             self.assertEqual(phonemizer.phonemize(case[0]), case[1])

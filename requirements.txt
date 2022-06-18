@@ -1,2 +1,2 @@
 parsivar
-wapiti3
+libwapiti >= 0.2.1

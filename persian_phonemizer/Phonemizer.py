@@ -1,5 +1,9 @@
 from distutils.log import error
-import hazm
+from parsivar import (
+    Normalizer,
+     Tokenizer,
+      POSTagger
+)
 from persian_phonemizer.utils import (
     valid_word,
      Database,
@@ -12,18 +16,19 @@ class Phonemizer():
         if not (output_format in ["IPA", "eraab"]):
             raise error #fix
         self.output_format = output_format
+        self.tokenizer = Tokenizer()
         self.normalize = normalize
-        self.tagger = hazm.POSTagger(model=POS_MODEL_PATH)
+        self.tagger = POSTagger(tagging_model="wapiti")
         if normalize:
-            self.normalizer = hazm.Normalizer()
+            self.normalizer = Normalizer()
         self.db = Database()
         
     def phonemize(self, text):
         if self.normalize:
             text = self.normalizer.normalize(text)
         phonemized_list = []
-        for sentence in hazm.sent_tokenize(text):
-            sentence_tokens = hazm.word_tokenize(sentence)
+        for sentence in self.tokenizer.tokenize_sentences(text):
+            sentence_tokens = self.tokenizer.tokenize_words(sentence)
             for idx, _ in enumerate(sentence_tokens):
                 pronounce = self.phonemize_word(sentence_tokens, idx)
                 phonemized_list.append(pronounce)
@@ -55,7 +60,7 @@ class Phonemizer():
         return word
 
     def choose_pronounce(self, sentence_tokens, idx, pronounces):
-        tagged_list = self.tagger.tag(sentence_tokens)
+        tagged_list = self.tagger.parse(sentence_tokens)
         word, pos = tagged_list[idx]
         persian_pos = self.translate_pos(pos)
         for pronounce in pronounces:

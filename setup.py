@@ -21,7 +21,7 @@ setuptools.setup(
         "Operating System :: OS Independent",
     ],
     packages=["persian_phonemizer"],
-    install_requires=['hazm >= 0.7'],
+    install_requires=['parsivar'],
     package_data={'persian_phonemizer': ['data/*.db']},
     python_requires=">=3.6",
 )

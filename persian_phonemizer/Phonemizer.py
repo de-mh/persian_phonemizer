@@ -6,8 +6,7 @@ from parsivar import (
 )
 from persian_phonemizer.utils import (
     valid_word,
-     Database,
-     POS_MODEL_PATH
+     Database
 )
 
 class Phonemizer():

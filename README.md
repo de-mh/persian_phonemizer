@@ -25,13 +25,8 @@ If you want to add new data or create the database from scratch, look in the dat
 
 To-Do list:
 - [X] parse Dehkhoda
-
 - [X] parse Moen
-
 - [X] use part-of-speech tagger to identify suiting paronounce
-
 - [ ] use dependecy parser to add 'e' between words when needed
-
 - [ ] train a model to predict pronounce for words missing from DB
-
 - [ ] use Bert to choose from pronounces with same POS

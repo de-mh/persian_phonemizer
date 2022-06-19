@@ -1,2 +1,1 @@
-parsivar
-libwapiti >= 0.2.1
+spacy >= 3.3

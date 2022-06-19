@@ -1,41 +1,33 @@
 from distutils.log import error
-from parsivar import (
-    Normalizer,
-     Tokenizer,
-      POSTagger
-)
+import spacy
+import pickle
 from persian_phonemizer.utils import (
     valid_word,
-     Database
+     Database,
+     POS_MODEL_DIR
 )
+from persian_phonemizer.dicts import pos_to_fa
 
 class Phonemizer():
 
-    def __init__(self, normalize=True, preserve_punctuations=True, output_format="IPA"):
+    def __init__(self, preserve_punctuations=True, output_format="IPA"):
         if not (output_format in ["IPA", "eraab"]):
             raise error #fix
         self.output_format = output_format
-        self.tokenizer = Tokenizer()
-        self.normalize = normalize
-        self.tagger = POSTagger(tagging_model="wapiti")
-        if normalize:
-            self.normalizer = Normalizer()
+        self.nlp = pickle.load(open(POS_MODEL_DIR, "rb"))
         self.db = Database()
         
     def phonemize(self, text):
-        if self.normalize:
-            text = self.normalizer.normalize(text)
         phonemized_list = []
-        for sentence in self.tokenizer.tokenize_sentences(text):
-            sentence_tokens = self.tokenizer.tokenize_words(sentence)
-            for idx, _ in enumerate(sentence_tokens):
-                pronounce = self.phonemize_word(sentence_tokens, idx)
-                phonemized_list.append(pronounce)
+        doc = self.nlp (text)
+        for idx, _ in enumerate(doc):
+            pronounce = self.phonemize_word(doc, idx)
+            phonemized_list.append(pronounce)
         return " ".join(phonemized_list)
         
             
     def phonemize_word(self, sentence_tokens, idx):
-        word = sentence_tokens[idx]
+        word = sentence_tokens[idx].text
         if not valid_word(word):
             return word
         pronounces = self.db.lookup_word(word)
@@ -59,19 +51,18 @@ class Phonemizer():
         return word
 
     def choose_pronounce(self, sentence_tokens, idx, pronounces):
-        tagged_list = self.tagger.parse(sentence_tokens)
-        word, pos = tagged_list[idx]
-        persian_pos = self.translate_pos(pos)
+        pos = sentence_tokens[idx].tag_
+        # print(sentence_tokens)
         for pronounce in pronounces:
             if pronounce[3] == None:
                 continue
-            if persian_pos in pronounce[3]:
+            if self.translate_pos(pronounce[3]) in pos:
                 return self.get_pronounce(pronounce)
         # warning : no match
         return self.get_pronounce(pronounces[0])       
 
     def translate_pos(self, pos):
-        return pos
+        return pos_to_fa.get(pos, "")
 
     def __del__(self):
         del self.db

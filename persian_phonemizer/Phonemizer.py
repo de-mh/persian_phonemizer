@@ -4,7 +4,8 @@ import pickle
 from persian_phonemizer.utils import (
     valid_word,
      Database,
-     POS_MODEL_DIR
+     POS_MODEL_PATH,
+     CFG_PATH
 )
 from persian_phonemizer.dicts import pos_to_fa
 
@@ -14,7 +15,10 @@ class Phonemizer():
         if not (output_format in ["IPA", "eraab"]):
             raise error #fix
         self.output_format = output_format
-        self.nlp = pickle.load(open(POS_MODEL_DIR, "rb"))
+        config = pickle.load(open(CFG_PATH, "rb"))
+        lang_cls = spacy.util.get_lang_class(config["nlp"]["lang"])
+        self.nlp = lang_cls.from_config(config)
+        self.nlp.from_bytes(pickle.load(open(POS_MODEL_PATH, "rb")))
         self.db = Database()
         
     def phonemize(self, text):

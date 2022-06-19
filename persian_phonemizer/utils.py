@@ -4,7 +4,8 @@ import os
 
 this_dir, _ = os.path.split(__file__)
 
-POS_MODEL_DIR = os.path.join(this_dir, "data/model.p")
+CFG_PATH = os.path.join(this_dir, "data/cfg")
+POS_MODEL_PATH = os.path.join(this_dir, "data/nlp_data")
 
 class Database:
     def __init__(self, db_file=""):

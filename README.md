@@ -24,14 +24,14 @@ Fast start:
 If you want to add new data or create the database from scratch, look in the dataset directory.
 
 To-Do list:
-[X] parse Dehkhoda
+- [X] parse Dehkhoda
 
-[X] parse Moen
+- [X] parse Moen
 
-[X] use part-of-speech tagger to identify suiting paronounce
+- [X] use part-of-speech tagger to identify suiting paronounce
 
-[ ] use dependecy parser to add 'e' between words when needed
+- [ ] use dependecy parser to add 'e' between words when needed
 
-[ ] train a model to predict pronounce for words missing from DB
+- [ ] train a model to predict pronounce for words missing from DB
 
-[ ] use Bert to choose from pronounces with same POS
+- [ ] use Bert to choose from pronounces with same POS

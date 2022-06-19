@@ -1,4 +1,5 @@
 /dataset/dehkhoda
-/dataset/dehkhoda*
+/dataset/*.db
 __pycache__/
+/dist
 *.log

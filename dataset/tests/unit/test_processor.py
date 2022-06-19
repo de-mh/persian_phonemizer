@@ -1,6 +1,5 @@
 import unittest
-from process import (
-    add_eraab_to_word,
+from process_dehkhoda import (
     validate_pronounce,
     extract_IPA
     )

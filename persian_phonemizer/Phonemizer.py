@@ -1,6 +1,7 @@
 from distutils.log import error
 import spacy
 import pickle
+from g2p_fa import G2P_Fa
 from persian_phonemizer.utils import (
     valid_word,
      Database,
@@ -20,6 +21,7 @@ class Phonemizer():
         self.nlp = lang_cls.from_config(config)
         self.nlp.from_bytes(pickle.load(open(POS_MODEL_PATH, "rb")))
         self.db = Database()
+        self.g2p = G2P_Fa()
         
     def phonemize(self, text):
         phonemized_list = []
@@ -52,7 +54,7 @@ class Phonemizer():
             return pronounce[2]
 
     def predict_pronounce(self, word):
-        return word
+        return self.g2p(word)
 
     def choose_pronounce(self, sentence_tokens, idx, pronounces):
         pos = sentence_tokens[idx].tag_

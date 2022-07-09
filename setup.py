@@ -8,7 +8,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setuptools.setup(
     name="persian_phonemizer",
-    version="0.2.0",
+    version="0.3.0",
     author="Mohamadhosein Dehghani",
     author_email="demh1377@gmail.com",
     description="A tool for translating Persian text to IPA (International Phonetic Alphabet)A small example package",

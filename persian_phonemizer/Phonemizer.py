@@ -29,6 +29,7 @@ class Phonemizer():
         for idx, _ in enumerate(doc):
             pronounce = self.phonemize_word(doc, idx)
             phonemized_list.append(pronounce)
+            self.post_process(doc, idx, phonemized_list)
         return " ".join(phonemized_list)
         
             
@@ -69,6 +70,16 @@ class Phonemizer():
 
     def translate_pos(self, pos):
         return pos_to_fa.get(pos, "")
+
+    def post_process(self, doc, idx, phonemized_list):
+        vowels = 'æeoː' if self.output_format == 'IPA' else 'ایو'
+        if phonemized_list[idx][-2:] == 'eh':
+            phonemized_list[idx] = phonemized_list[idx][:-1]
+        if doc[idx].dep_ in ['nmod', 'amod']:
+            if phonemized_list[-2][-1] in vowels:
+                phonemized_list[-2] += 'je' if self.output_format == 'IPA' else '‌ی'
+            else:
+                phonemized_list[-2] += 'e' if self.output_format == 'IPA' else 'ِ'
 
     def __del__(self):
         del self.db

@@ -1,5 +1,6 @@
 from distutils.log import error
 import spacy
+import hazm
 import pickle
 from g2p_fa import G2P_Fa
 from persian_phonemizer.utils import (
@@ -8,14 +9,21 @@ from persian_phonemizer.utils import (
      POS_MODEL_PATH,
      CFG_PATH
 )
-from persian_phonemizer.dicts import pos_to_fa
+from persian_phonemizer.dicts import (
+    pos_to_fa,
+    IPA_additives,
+    eraab_additives
+)
 
 class Phonemizer():
 
     def __init__(self, preserve_punctuations=True, output_format="IPA"):
         if not (output_format in ["IPA", "eraab"]):
             raise error #fix
+        self.additive_dict = IPA_additives if output_format == "IPA" else eraab_additives
         self.output_format = output_format
+        self.normalizer = hazm.Normalizer()
+        self.lemmatizer = hazm.Lemmatizer()
         config = pickle.load(open(CFG_PATH, "rb"))
         lang_cls = spacy.util.get_lang_class(config["nlp"]["lang"])
         self.nlp = lang_cls.from_config(config)
@@ -24,6 +32,7 @@ class Phonemizer():
         self.g2p = G2P_Fa()
         
     def phonemize(self, text):
+        text = self.normalizer.normalize(text)
         phonemized_list = []
         doc = self.nlp (text)
         for idx, _ in enumerate(doc):
@@ -37,6 +46,20 @@ class Phonemizer():
         word = sentence_tokens[idx].text
         if not valid_word(word):
             return word
+
+        root = self.lemmatizer.lemmatize(word)
+        word_additives = []
+        if root != word:
+            if '#' in root:
+                root_forms = root.split('#')
+                for i in range(1):
+                    if root_forms[i] in word:
+                        word_additives = word.split(root_forms[0])
+                        word = root_forms[i]
+            else:
+                word_additives = word.split(root)
+                word = root
+
         pronounces = self.db.lookup_word(word)
         pronounces_count = len(pronounces)
         if pronounces_count == 0:
@@ -44,9 +67,16 @@ class Phonemizer():
         elif pronounces_count == 1:
             pronounce = self.get_pronounce(pronounces[0])
         else:
-            # needs disambiguation
-            pronounce = self.choose_pronounce(sentence_tokens, idx, pronounces)
+            pronounce = self.choose_pronounce(sentence_tokens, idx, pronounces)4
+
+        pronounce = self.phonemize_additives(pronounce, word_additives)
         return pronounce
+
+    def phonemize_additives(self, pronounce, word_additives):
+        if len(word_additives) == 0:
+            return pronounce
+        pronounce = self.additive_disct[word_additives[0]] + pronounce
+        pronounce += self.additive_dict[word_additives[1]]
 
     def get_pronounce(self, pronounce):
         if self.output_format == "IPA":

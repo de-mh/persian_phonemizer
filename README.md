@@ -30,5 +30,5 @@ To-Do list:
 - [X] use part-of-speech tagger to identify suiting paronounce
 - [X] use dependecy parser to add 'e' between words when needed
 - [X] train a model to predict pronounce for words missing from DB
+- [X] add lemmatizer for better coverage
 - [ ] use Bert to choose from pronounces with same POS
-- [ ] add lemmatizer for better coverage

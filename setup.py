@@ -1,14 +1,14 @@
 import setuptools
-from pathlib import Path
-
-this_dir = Path(__file__).parent
 
 with open("README.md", "r", encoding="utf-8") as fh:
     long_description = fh.read()
 
+with open("requirements.txt", "r", encoding="utf-8") as requirements_file:
+        requirements = requirements_file.read().splitlines()
+
 setuptools.setup(
     name="persian_phonemizer",
-    version="0.3.0",
+    version="0.4.0",
     author="Mohamadhosein Dehghani",
     author_email="demh1377@gmail.com",
     description="A tool for translating Persian text to IPA (International Phonetic Alphabet)A small example package",
@@ -21,7 +21,7 @@ setuptools.setup(
         "Operating System :: OS Independent",
     ],
     packages=["persian_phonemizer"],
-    install_requires=['parsivar'],
+    install_requires=requirements,
     package_data={'persian_phonemizer': ['data/*']},
     python_requires=">=3.6",
 )

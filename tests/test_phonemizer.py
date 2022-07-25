@@ -6,8 +6,8 @@ class TestPhonemizer(unittest.TestCase):
     def test_Phonemizer_IPA(self):
         phonemizer = Phonemizer()
         cases = [
-            ("فارسی", "fɒːɾsiː"),
-            ("این یک متن فارسی است.", "ʔiːn jækʰ mætʰne fɒːɾsiː ʔæstʰ ."),
+            ("نمی‌رفتیم", "nemiːɾæftʰiːm"),
+            ("کتاب علی را بردند.", "kʰetʰɒːbe ʔæliː ɾɒː boɾdænd ."),
             ("آن مرد مرد.", "ʔɒːn mæɾd moɾd ."),
             ("دوچرخه جدید علی گم شد.", "dovtʃʰæɾxeje dʒædiːde ʔæliː ɡom ʃod .")
             ]
@@ -17,8 +17,8 @@ class TestPhonemizer(unittest.TestCase):
     def test_Phonemizer_eraab(self):
         phonemizer = Phonemizer(output_format="eraab")
         cases = [
-            ("فارسی", "فارسی"), ("سلام", "سَلام"), 
-            ("این متن فارسی است.", "این مَتنِ فارسی اَست ."),
+            ("نمی‌گفتیم", "نِمی\u200cگُفتیم"), ("سلام", "سَلام"), 
+            ("کتاب علی را بردند.", "کِتابِ علی را بُردَند ."),
             ("آن مرد مرد.", "آن مَرد مُرد .")
             ]
         for case in cases:

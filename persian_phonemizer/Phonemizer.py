@@ -53,7 +53,7 @@ class Phonemizer():
             if '#' in root:
                 root_forms = root.split('#')
                 for i in range(1):
-                    if root_forms[i] in word:
+                    if root_forms[i] != '' and root_forms[i] in word:
                         word_additives = word.split(root_forms[0])
                         word = root_forms[i]
             else:
@@ -88,7 +88,10 @@ class Phonemizer():
             return pronounce[2]
 
     def predict_pronounce(self, word):
-        return self.g2p(word)
+        if self.output_format == "IPA":
+            return self.g2p(word)
+        else:
+            return word
 
     def choose_pronounce(self, sentence_tokens, idx, pronounces):
         pos = sentence_tokens[idx].tag_

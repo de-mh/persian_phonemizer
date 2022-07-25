@@ -67,7 +67,7 @@ class Phonemizer():
         elif pronounces_count == 1:
             pronounce = self.get_pronounce(pronounces[0])
         else:
-            pronounce = self.choose_pronounce(sentence_tokens, idx, pronounces)4
+            pronounce = self.choose_pronounce(sentence_tokens, idx, pronounces)
 
         pronounce = self.phonemize_additives(pronounce, word_additives)
         return pronounce
@@ -75,8 +75,11 @@ class Phonemizer():
     def phonemize_additives(self, pronounce, word_additives):
         if len(word_additives) == 0:
             return pronounce
-        pronounce = self.additive_disct[word_additives[0]] + pronounce
-        pronounce += self.additive_dict[word_additives[1]]
+        if word_additives[0] != '':
+            pronounce = self.additive_dict[word_additives[0]] + pronounce
+        if word_additives[1] != '':
+            pronounce += self.additive_dict[word_additives[1]]
+        return pronounce
 
     def get_pronounce(self, pronounce):
         if self.output_format == "IPA":

@@ -3,8 +3,7 @@ import setuptools
 with open("README.md", "r", encoding="utf-8") as fh:
     long_description = fh.read()
 
-with open("requirements.txt", "r", encoding="utf-8") as requirements_file:
-        requirements = requirements_file.read().splitlines()
+requirements = ['spacy >= 3.3', 'g2p_fa', 'hazm']
 
 setuptools.setup(
     name="persian_phonemizer",

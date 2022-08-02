@@ -54,7 +54,7 @@ class Phonemizer():
                 root_forms = root.split('#')
                 for i in range(1):
                     if root_forms[i] != '' and root_forms[i] in word:
-                        word_additives = word.split(root_forms[0])
+                        word_additives = word.split(root_forms[i])
                         word = root_forms[i]
             else:
                 word_additives = word.split(root)
@@ -76,9 +76,9 @@ class Phonemizer():
         if len(word_additives) == 0:
             return pronounce
         if word_additives[0] != '':
-            pronounce = self.additive_dict[word_additives[0]] + pronounce
+            pronounce = self.additive_dict[word_additives[0].strip('‌')] + pronounce
         if word_additives[1] != '':
-            pronounce += self.additive_dict[word_additives[1]]
+            pronounce += self.additive_dict[word_additives[1].strip('‌')]
         return pronounce
 
     def get_pronounce(self, pronounce):

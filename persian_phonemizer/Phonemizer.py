@@ -1,15 +1,14 @@
-from distutils.log import error
 import spacy
 import hazm
 import pickle
 from g2p_fa import G2P_Fa
-from persian_phonemizer.utils import (
+from .utils import (
     valid_word,
      Database,
      POS_MODEL_PATH,
      CFG_PATH
 )
-from persian_phonemizer.dicts import (
+from .dicts import (
     pos_to_fa,
     IPA_additives,
     eraab_additives
@@ -19,7 +18,8 @@ class Phonemizer():
 
     def __init__(self, preserve_punctuations=True, output_format="IPA"):
         if not (output_format in ["IPA", "eraab"]):
-            raise error #fix
+            print("outpt_format should be either 'IPA' or 'eraab'")
+            raise
         self.additive_dict = IPA_additives if output_format == "IPA" else eraab_additives
         self.output_format = output_format
         self.normalizer = hazm.Normalizer()
@@ -95,13 +95,11 @@ class Phonemizer():
 
     def choose_pronounce(self, sentence_tokens, idx, pronounces):
         pos = sentence_tokens[idx].tag_
-        # print(sentence_tokens)
         for pronounce in pronounces:
             if pronounce[3] == None:
                 continue
             if self.translate_pos(pronounce[3]) in pos:
                 return self.get_pronounce(pronounce)
-        # warning : no match
         return self.get_pronounce(pronounces[0])       
 
     def translate_pos(self, pos):

@@ -11,7 +11,7 @@ A few examples of use cases of this library are:
 
 ## Installation
 
-```
+```bash
 pip install persian_phonemizer
 ```
 
@@ -19,7 +19,7 @@ pip install persian_phonemizer
 
 Fast start:
 
-```
+```python
 >>> from persian_phonemizer import Phonemizer
 >>> phonemizer = Phonemizer()
 >>> phonemizer.phonemize("آن مرد مرد.")
@@ -30,7 +30,7 @@ Fast start:
 
 you can set the package to output Persian text with eraab instead of IPA:
 
-```
+```python
 >>> phonemizer = Phonemizer(output_format='eraab')
 >>> phonemizer.phonemize("آن مرد مرد.")
 'آن مَرد مُرد .'

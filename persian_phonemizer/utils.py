@@ -9,13 +9,23 @@ POS_MODEL_PATH = os.path.join(this_dir, "data/nlp_data")
 
 class Database:
     def __init__(self, db_file=""):
-        """create a database connection to a SQLite database"""
+        """create a database connection to a SQLite database.
+        Args:
+            db_file: path string directing to DB file
+        """
         if db_file == "":
             db_file = os.path.join(this_dir, "data/moen_parsed.db")
         self.conn = sqlite3.connect(db_file)
         self.cursor = self.conn.cursor()
 
     def lookup_word(self, word):
+        """lookup all pronunciations of a word.
+        Args:
+            word: string containing the word for lookup
+
+        Returns:
+            list of pronuunciation tuples
+        """
         lookup_word_query = """ SELECT * FROM dictionary WHERE word = ? """
         self.cursor.execute(lookup_word_query, (word,))
         rows = self.cursor.fetchall()
@@ -25,6 +35,7 @@ class Database:
         self.conn.close()
 
 def valid_word(word):
+    """Check if the given word is only containing persian word characters."""
     persian_alpha_codepoints = '\u0621-\u0628\u062A-\u063A\u0641-\u0642\u0644-\u0648\u064E-\u0651\u0655\u067E\u0686\u0698\u06A9\u06AF\u06BE\u06CC\u200C'
     result = re.search(f'^[{persian_alpha_codepoints}]*$', word)
     return result

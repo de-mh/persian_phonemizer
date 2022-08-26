@@ -1,25 +1,27 @@
-from distutils.log import error
 import spacy
 import hazm
 import pickle
 from g2p_fa import G2P_Fa
-from persian_phonemizer.utils import (
+from .utils import (
     valid_word,
      Database,
      POS_MODEL_PATH,
      CFG_PATH
 )
-from persian_phonemizer.dicts import (
+from .dicts import (
     pos_to_fa,
     IPA_additives,
     eraab_additives
 )
 
 class Phonemizer():
+    """A class for generating IPA from raw persian text."""
 
-    def __init__(self, preserve_punctuations=True, output_format="IPA"):
+    def __init__(self, output_format="IPA"):
+        """Construct normalizer, lemmatizer and G2P, setup settings, load POSTagger, Dependecy Parser and DataBase"""
         if not (output_format in ["IPA", "eraab"]):
-            raise error #fix
+            print("outpt_format should be either 'IPA' or 'eraab'")
+            raise
         self.additive_dict = IPA_additives if output_format == "IPA" else eraab_additives
         self.output_format = output_format
         self.normalizer = hazm.Normalizer()
@@ -32,6 +34,13 @@ class Phonemizer():
         self.g2p = G2P_Fa()
         
     def phonemize(self, text):
+        """Phonemize text
+        Args:
+            text: raw persian text
+
+        Returns:
+            Phonemized text
+        """
         text = self.normalizer.normalize(text)
         phonemized_list = []
         doc = self.nlp (text)
@@ -43,6 +52,13 @@ class Phonemizer():
         
             
     def phonemize_word(self, sentence_tokens, idx):
+        """Phonemize a word in a sentence.
+        Args:
+            sentence_tokens: list of word tokens in a sentence parsed by spacy
+            idx: index of target word in the sentence_tokens
+        Returns:
+            string of phonemized text
+        """
         word = sentence_tokens[idx].text
         if not valid_word(word):
             return word
@@ -73,6 +89,14 @@ class Phonemizer():
         return pronounce
 
     def phonemize_additives(self, pronounce, word_additives):
+        """Add pronunciation for additives of compound words.
+        Args:
+            pronunce: string of pronunce for base form of word
+            word_additives: list of prefix and sffix of word if available
+        
+        Returns:
+            full word pronounce string
+        """
         if len(word_additives) == 0:
             return pronounce
         if word_additives[0] != '':
@@ -82,32 +106,42 @@ class Phonemizer():
         return pronounce
 
     def get_pronounce(self, pronounce):
+        """Exteract the pronunciation from pronunciation tuple based on output_format."""
         if self.output_format == "IPA":
             return pronounce[4]
         elif self.output_format == "eraab":
             return pronounce[2]
 
     def predict_pronounce(self, word):
+        """Predict pronunciation of the word using G2P model."""
         if self.output_format == "IPA":
             return self.g2p(word)
         else:
             return word
 
     def choose_pronounce(self, sentence_tokens, idx, pronounces):
+        """Choose the best pronunciation from available ones.
+        Args:
+            sentence_tokens: list of word tokens in a sentence parsed by spacy
+            idx: index of target word in the sentence_tokens
+            prononces: list of available pronounces
+        Returns:
+            string of chosen pronounce
+            """
         pos = sentence_tokens[idx].tag_
-        # print(sentence_tokens)
         for pronounce in pronounces:
             if pronounce[3] == None:
                 continue
             if self.translate_pos(pronounce[3]) in pos:
                 return self.get_pronounce(pronounce)
-        # warning : no match
         return self.get_pronounce(pronounces[0])       
 
     def translate_pos(self, pos):
+        """Convert pos from DB standard to spacy ouutput."""
         return pos_to_fa.get(pos, "")
 
     def post_process(self, doc, idx, phonemized_list):
+        """Modify pronounce to add e or ye when needed"""
         vowels = 'æeoː' if self.output_format == 'IPA' else 'ایو'
         if phonemized_list[idx][-2:] == 'eh':
             phonemized_list[idx] = phonemized_list[idx][:-1]
